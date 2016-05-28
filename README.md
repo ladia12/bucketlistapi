@@ -10,15 +10,16 @@ Setup Virtual Environment and install flask
 7) pip install Flask
 
 Get all libraries used
-8) pip freeze > requirements.txt
+8)pip install psycopg2==2.6.1 Flask-SQLAlchemy===2.1 Flask-Migrate==1.8.0 passlib==1.6.5 MySQL-python==1.2.5
+9) pip freeze > requirements.txt
 
 Setup DataBase:
-9) Create database "bucketlist" with root username and no password
-10) python bucketlist.py db init
-11) python bucketlist.py db migrate
+10) Create database "bucketlist" with root username and no password
+11) python bucketlist.py db init
+12) python bucketlist.py db migrate
 
 When any update in the migration file is done the use this command,
-12) python bucketlist.py db upgrade
+13) python bucketlist.py db upgrade
 
 To run server
-13) python bucketlist.py runserver
+14) python bucketlist.py runserver
