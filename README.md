@@ -1,3 +1,4 @@
+SETUP:
 1) cd ~/Documents
 2) git clone https://github.com/ladia12/bucketlistapi
 
