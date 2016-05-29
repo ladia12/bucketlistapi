@@ -17,6 +17,9 @@
 **Get all libraries used**
 
     pip install psycopg2==2.6.1 Flask-SQLAlchemy===2.1 Flask-Migrate==1.8.0 passlib==1.6.5 MySQL-python==1.2.5
+
+    (in case you get error in import)
+	export PATH=$PATH:/usr/local/mysql/bin
     
     pip freeze > requirements.txt
 
