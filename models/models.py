@@ -11,6 +11,7 @@ class User(db.Model):
     last_name = db.Column(db.String(32))
     password_hash = db.Column(db.String(120))
     email = db.Column(db.String(130), nullable=False, unique=True)
+    contact_number = db.Column(db.String(12))
     profile_url = db.Column(db.String(130))
     about_me = db.Column(db.Text)
     city = db.Column(db.String(32))
@@ -106,7 +107,6 @@ class SuccessStory(db.Model):
     video_url = db.Column(db.String(130))
     created_at = db.Column(db.DateTime, default=datetime.now())
     updated_at = db.Column(db.DateTime, default=datetime.now())
-    goals = db.relationship('UserGoal', backref="list", lazy='dynamic')
     ss_likes = db.relationship('SuccessStoryLike', backref=db.backref('successstory', lazy='joined'), lazy='dynamic',
                                cascade="all, delete, delete-orphan")
 
