@@ -10,6 +10,7 @@ class User(db.Model):
     first_name = db.Column(db.String(32), nullable=False)
     last_name = db.Column(db.String(32))
     password_hash = db.Column(db.String(120))
+    token = db.Column(db.String(130), nullable=False)
     email = db.Column(db.String(130), nullable=False, unique=True)
     contact_number = db.Column(db.String(12))
     profile_url = db.Column(db.String(130))
@@ -26,6 +27,9 @@ class User(db.Model):
 
     def hash_password(self, password):
         self.password_hash = pwd_context.encrypt(password)
+
+    def verify_password(self, password):
+        return pwd_context.verify(password, self.password_hash)
 
 
 class Goal(db.Model):
