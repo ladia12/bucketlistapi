@@ -114,10 +114,13 @@ def signup():
             user.last_name = last_name
             user.contact_number = contact_no
             user.hash_password(password)
-            user.token = generate_auth_token(user).decode('ascii')
+            user.token = ""
             user.created_at = datetime.now()
             user.updated_at = datetime.now()
             db.session.add(user)
+            db.session.commit()
+            user = User.query.filter_by(email=user.email).first()
+            user.token = generate_auth_token(user).decode('ascii')
             db.session.commit()
             return jsonify({'success': True, 'token': user.token}), 201
 
@@ -130,7 +133,7 @@ def get_user(id):
     return jsonify({'email': user.email})
 
 
-@app.route('/resource')
+@app.route('/resource', methods=['GET'])
 @auth.login_required
 def get_resource():
     return jsonify({'data': 'Hello!'})
