@@ -10,6 +10,7 @@ from logging import Formatter
 from logging.handlers import RotatingFileHandler
 from itsdangerous import (TimedJSONWebSignatureSerializer
                           as Serializer, BadSignature, SignatureExpired)
+import constants
 
 app = create_app()
 file_handler = RotatingFileHandler('flask_app.log', maxBytes=10000, backupCount=1)
@@ -131,6 +132,76 @@ def get_user(id):
     if not user:
         abort(400)
     return jsonify({'email': user.email})
+
+
+@app.route('/api/goals', methods=['POST'])
+@auth.login_required
+def create_goal():
+    goal = Goal()
+    goal.user_id = g.user.id
+    goal.name = request.json.get('name')
+    goal.image_url = request.json.get('image_url')
+    goal.cat_id = request.json.get('cat_id')
+    db.session.add(goal)
+    db.session.commit()
+    user_goal = UserGoal()
+    user_goal.user_id = g.user.id
+    user_goal.goal_id = goal.id
+    user_goal.lat = request.json.get('lat')
+    user_goal.long = request.json.get('long')
+    user_goal.date_target = request.json.get('date_target')
+    user_goal.privacy = request.json.get('privacy')
+    db.session.add(user_goal)
+    db.session.commit()
+    return jsonify({'success': True}), 201
+
+
+@app.route('/api/goals', methods=['GET'])
+@auth.login_required
+def get_all_goals():
+    goals = Goal.query.all()
+    return jsonify(goals=[i.serialize for i in goals]), 200
+
+
+@app.route('/api/goals/<goalid>/like', methods=['POST'])
+@auth.login_required
+def like_goal(goalid):
+    user = g.user
+    goallike = GoalLike.query.filter_by(goal_id=goalid, user_id=g.user.id).first()
+    if goallike is None:
+        like = GoalLike()
+        like.user_id = user.id
+        like.goal_id = goalid
+        db.session.add(like)
+        db.session.commit()
+        return jsonify({'success': True}), 201
+    else:
+        db.session.delete(goallike)
+        db.session.commit()
+        return jsonify({'success': True}), 201
+
+
+@app.route('api/goals/<goalid>/add', methods=['POST'])
+@auth.login_required
+def add_goal(goalid):
+    user_goal = UserGoal.query.filter_by(goal_id=goalid, user_id=g.user.id)
+    if user_goal.first() is None:
+        new_goal = UserGoal()
+        new_goal.user_id = g.user.id
+        new_goal.goal_id = goalid
+        new_goal.lat = request.json.get('lat')
+        new_goal.long = request.json.get('long')
+        new_goal.date_target = request.json.get('date_target')
+        new_goal.privacy = request.json.get('privacy')
+        db.session.add(new_goal)
+        db.session.commit()
+    else:
+        db.session.delete(user_goal)
+        db.session.commit()
+    if user_goal.count() == 1:
+        goal = Goal.query.filter_by(goal_id=goalid).first()
+        db.session.remove(goal)
+        db.session.commit()
 
 
 @app.route('/resource', methods=['GET'])

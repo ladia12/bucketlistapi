@@ -1,0 +1,21 @@
+2016-09-04 19:12:58,566 ERROR: Exception on /api/goals/11/like [POST] [in /Users/ladia/Documents/bucketlist/venv/lib/python2.7/site-packages/flask/app.py:1423]
+Traceback (most recent call last):
+  File "/Users/ladia/Documents/bucketlist/venv/lib/python2.7/site-packages/flask/app.py", line 1817, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/ladia/Documents/bucketlist/venv/lib/python2.7/site-packages/flask/app.py", line 1477, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/ladia/Documents/bucketlist/venv/lib/python2.7/site-packages/flask/app.py", line 1381, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/Users/ladia/Documents/bucketlist/venv/lib/python2.7/site-packages/flask/app.py", line 1475, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/ladia/Documents/bucketlist/venv/lib/python2.7/site-packages/flask/app.py", line 1461, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/Users/ladia/Documents/bucketlist/venv/lib/python2.7/site-packages/flask_httpauth.py", line 54, in decorated
+    return f(*args, **kwargs)
+  File "/Users/ladia/Documents/bucketlist/bucketlist.py", line 180, in like_goal
+    db.session.delete(goallike)
+  File "/Users/ladia/Documents/bucketlist/venv/lib/python2.7/site-packages/sqlalchemy/orm/scoping.py", line 157, in do
+    return getattr(self.registry(), name)(*args, **kwargs)
+  File "/Users/ladia/Documents/bucketlist/venv/lib/python2.7/site-packages/sqlalchemy/orm/session.py", line 1621, in delete
+    raise exc.UnmappedInstanceError(instance)
+UnmappedInstanceError: Class '__builtin__.NoneType' is not mapped

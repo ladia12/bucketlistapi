@@ -1,5 +1,4 @@
 from shared import db
-from sqlalchemy import *
 from datetime import datetime
 from passlib.apps import custom_app_context as pwd_context
 
@@ -22,8 +21,11 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.now())
     updated_at = db.Column(db.DateTime, default=datetime.now())
     user_goals = db.relationship('UserGoal', backref="user", cascade="all, delete-orphan", lazy='dynamic')
+    goal = db.relationship('Goal', backref="user", cascade="all, delete-orphan", uselist=False)
     ug_likes = db.relationship('UserGoalLike', backref=db.backref('user', lazy='joined'), lazy='dynamic',
                                cascade="all, delete, delete-orphan")
+    g_likes = db.relationship('GoalLike', backref=db.backref('user', lazy='joined'), lazy='dynamic',
+                              cascade="all, delete, delete-orphan")
 
     def hash_password(self, password):
         self.password_hash = pwd_context.encrypt(password)
@@ -35,14 +37,33 @@ class User(db.Model):
 class Goal(db.Model):
     __tablename__ = 'goal'
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     name = db.Column(db.String(256), nullable=False)
-    category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
+    cat_id = db.Column(db.Integer, default=1)
     image_url = db.Column(db.String(130))
-    no_added = db.Column(db.Integer)
-    no_completed = db.Column(db.Integer)
+    no_added = db.Column(db.Integer, default=1)
+    no_completed = db.Column(db.Integer, default=0)
     created_at = db.Column(db.DateTime, default=datetime.now())
     updated_at = db.Column(db.DateTime, default=datetime.now())
     user_goals = db.relationship('UserGoal', backref="goal", cascade="all, delete-orphan", lazy='dynamic')
+    g_likes = db.relationship('GoalLike', backref=db.backref('goal', lazy='joined'), lazy='dynamic',
+                               cascade="all, delete, delete-orphan")
+
+    @property
+    def serialize(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'first_name': self.user.first_name,
+            'last_name': self.user.last_name,
+            'name': self.name,
+            'cat_id': self.cat_id,
+            'image_url': self.image_url,
+            'no_added': self.no_added,
+            'no_completed': self.no_completed,
+            'created_at': self.created_at,
+            'updated_at': self.updated_at
+        }
 
 
 class UserGoal(db.Model):
@@ -71,21 +92,13 @@ class UserGoalLike(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.now())
 
 
-association_table = Table('association', db.Model.metadata,
-                          Column('goal_id', Integer, ForeignKey('goal.id')),
-                          Column('category_id', Integer, ForeignKey('category.id'))
-                          )
-
-
-class Category(db.Model):
-    __tablename__ = "category"
+class GoalLike(db.Model):
+    __tablename__ = "goal_like"
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(128), nullable=False)
+    goal_id = db.Column(db.ForeignKey('goal.id'))
+    user_id = db.Column(db.ForeignKey('user.id'))
     created_at = db.Column(db.DateTime, default=datetime.now())
     updated_at = db.Column(db.DateTime, default=datetime.now())
-    goal = db.relationship("Goal",
-                           secondary=association_table,
-                           backref="categories")
 
 
 class List(db.Model):
